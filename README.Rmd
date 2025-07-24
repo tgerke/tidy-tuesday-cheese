@@ -1,0 +1,83 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# tidy-tuesday-cheese
+
+Packages.
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+Data.
+
+```{r}
+cheeses <- read_csv(
+  'https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-06-04/cheeses.csv'
+)
+```
+
+From the tidy tuesday readme:
+
+> 248 cheeses have listed fat content. Is there a relationship between fat content and cheese type? What about texture, flavor, or aroma?
+
+Let's start by looking at the fat content column.
+
+```{r}
+# needs repair to be numeric
+cheeses |>
+  count(fat_content)
+
+# replace ranges with mean and strip %
+cheeses <- cheeses |>
+  mutate(
+    fat_content_numeric = case_when(
+      str_detect(fat_content, "^[0-9]+-[0-9]+%$") ~ {
+        nums <- str_match(fat_content, "^([0-9]+)-([0-9]+)%$")
+        rowMeans(cbind(as.numeric(nums[,2]), as.numeric(nums[,3])), na.rm = TRUE)
+      },
+      TRUE ~ as.numeric(str_extract(fat_content, "[0-9]+(\\.[0-9]+)?"))
+    )
+  )
+
+# check that it worked
+cheeses |>
+  select(fat_content, fat_content_numeric) |>
+  distinct() |>
+  arrange(fat_content_numeric) |> 
+  head(20)
+```
+
+Now cheese type.
+
+```{r}
+# cheese name is not helpful: each row is unique
+cheeses |> 
+  count(n_distinct(cheese))
+
+# subcategorizing by animal source could be interesting
+cheeses |> 
+  count(milk, sort = TRUE)
+```
+
+Any trend by source?
+
+```{r}
+cheeses |> 
+  filter(
+    milk %in% c("cow", "goat", "sheep"),
+    !is.na(fat_content_numeric)
+  ) |> 
+  ggplot(aes(x = milk, y = fat_content_numeric)) +
+  geom_boxplot()
+```
