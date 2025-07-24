@@ -16,6 +16,7 @@ library(tidyverse)
 library(viridis)
 library(ggdist)
 library(ggbeeswarm)
+library(hrbrthemes)
 ```
 
 Data.
@@ -355,7 +356,7 @@ Try a violin with jitter.
 ggplot(plot_data, aes(x = flavor_aroma, y = fat_content_numeric, fill = flavor_aroma)) +
   geom_violin(trim = FALSE, alpha = 0.7, color = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5, color = "black") +
-  facet_wrap(~ type_category, labeller = as_labeller(c(hard = "🪨", soft = "🧽"))) +
+  facet_wrap(~ type_category, labeller = as_labeller(c(hard = "Hard", soft = "Soft"))) +
   scale_fill_viridis(discrete = TRUE, option = "C") +
   labs(
     title = "Fat Content by Cheese Type and Flavor/Aroma",
@@ -363,11 +364,11 @@ ggplot(plot_data, aes(x = flavor_aroma, y = fat_content_numeric, fill = flavor_a
     y = "Fat Content (%)",
     fill = "Flavor/Aroma"
   ) +
-  theme_minimal(base_size = 14) +
+  hrbrthemes::theme_ipsum(base_size = 14) +
   theme(
     plot.title.position = "plot", # ensures title is aligned to the plot area
     plot.title = element_text(hjust = 0), # left-aligns the title
-    axis.text.x = element_text(angle = 25, hjust = 1),
+    axis.text.x = element_text(size = 9, angle = 25, hjust = 1),
     legend.position = "none",
     panel.grid.major.x = element_blank()
   )
@@ -430,7 +431,7 @@ Let’s make that prettier.
 ggplot(plot_data, aes(x = flavor_aroma, y = fat_content_numeric, fill = flavor_aroma)) +
   geom_violin(trim = FALSE, alpha = 0.7, color = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5, color = "black") +
-  facet_wrap(~ type_category, labeller = as_labeller(c(hard = "🪨", soft = "🧽"))) +
+  facet_wrap(~ type_category, labeller = as_labeller(c(hard = "Hard", soft = "Soft"))) +
   scale_fill_viridis(discrete = TRUE, option = "C") +
   labs(
     title = "Fat Content by Cheese Type and Flavor/Aroma",
@@ -438,11 +439,11 @@ ggplot(plot_data, aes(x = flavor_aroma, y = fat_content_numeric, fill = flavor_a
     y = "Fat Content (%)",
     fill = "Flavor/Aroma"
   ) +
-  theme_minimal(base_size = 14) +
+  hrbrthemes::theme_ipsum(base_size = 14) +
   theme(
     plot.title.position = "plot", # ensures title is aligned to the plot area
     plot.title = element_text(hjust = 0), # left-aligns the title
-    axis.text.x = element_text(angle = 25, hjust = 1),
+    axis.text.x = element_text(size = 9, angle = 25, hjust = 1),
     legend.position = "none",
     panel.grid.major.x = element_blank()
   )
