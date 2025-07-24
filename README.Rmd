@@ -11,7 +11,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# tidy-tuesday-cheese
+# PCCTC Tidy Tuesday event
+
+This is a fun little PCCTC data science team exercise in which we all took 90 minutes to tackle a previous Tidy Tuesday challenge.
+Here's my entry that I stitched together in that rush.
+
+---
 
 Packages.
 
@@ -31,7 +36,7 @@ From the tidy tuesday readme:
 
 > 248 cheeses have listed fat content. Is there a relationship between fat content and cheese type? What about texture, flavor, or aroma?
 
-Let's start by looking at the fat content column.
+Let's start by looking at the fat content column, which needs some help to become numeric.
 
 ```{r}
 # needs repair to be numeric
@@ -79,5 +84,39 @@ cheeses |>
     !is.na(fat_content_numeric)
   ) |> 
   ggplot(aes(x = milk, y = fat_content_numeric)) +
+  geom_boxplot()
+```
+
+Moving on to cheese type.
+
+```{r}
+# these are silly, just make hard or soft
+cheeses |> 
+  count(type, sort = TRUE)
+
+cheeses <- cheeses |>
+  mutate(
+    type_category = case_when(
+      str_detect(type, regex("hard|firm", ignore_case = TRUE)) ~ "hard",
+      str_detect(type, regex("soft", ignore_case = TRUE)) ~ "soft",
+      TRUE ~ NA_character_
+    )
+  )
+
+cheeses |>
+  select(type, type_category) |>
+  distinct() |>
+  head(20)
+```
+
+Any trend by type?
+
+```{r}
+cheeses |> 
+  filter(
+    !is.na(type_category),
+    !is.na(fat_content_numeric)
+  ) |> 
+  ggplot(aes(x = type_category, y = fat_content_numeric)) +
   geom_boxplot()
 ```

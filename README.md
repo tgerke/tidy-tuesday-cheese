@@ -1,7 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# tidy-tuesday-cheese
+# PCCTC Tidy Tuesday event
+
+This is a fun little PCCTC data science team exercise in which we all
+took 90 minutes to tackle a previous Tidy Tuesday challenge. Here’s my
+entry that I stitched together in that rush.
+
+------------------------------------------------------------------------
 
 Packages.
 
@@ -30,7 +36,8 @@ From the tidy tuesday readme:
 > 248 cheeses have listed fat content. Is there a relationship between
 > fat content and cheese type? What about texture, flavor, or aroma?
 
-Let’s start by looking at the fat content column.
+Let’s start by looking at the fat content column, which needs some help
+to become numeric.
 
 ``` r
 # needs repair to be numeric
@@ -137,3 +144,76 @@ cheeses |>
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+Moving on to cheese type.
+
+``` r
+# these are silly, just make hard or soft
+cheeses |> 
+  count(type, sort = TRUE)
+#> # A tibble: 85 × 2
+#>    type                    n
+#>    <chr>               <int>
+#>  1 semi-hard, artisan    133
+#>  2 hard, artisan         121
+#>  3 semi-soft, artisan    117
+#>  4 soft, artisan          99
+#>  5 soft                   90
+#>  6 hard                   75
+#>  7 semi-hard              70
+#>  8 semi-soft              56
+#>  9 soft, soft-ripened     51
+#> 10 fresh soft, artisan    38
+#> # ℹ 75 more rows
+
+cheeses <- cheeses |>
+  mutate(
+    type_category = case_when(
+      str_detect(type, regex("hard|firm", ignore_case = TRUE)) ~ "hard",
+      str_detect(type, regex("soft", ignore_case = TRUE)) ~ "soft",
+      TRUE ~ NA_character_
+    )
+  )
+
+cheeses |>
+  select(type, type_category) |>
+  distinct() |>
+  head(20)
+#> # A tibble: 20 × 2
+#>    type                       type_category
+#>    <chr>                      <chr>        
+#>  1 semi-soft                  soft         
+#>  2 semi-hard, artisan         hard         
+#>  3 semi-hard                  hard         
+#>  4 semi-soft, artisan, brined soft         
+#>  5 soft, artisan              soft         
+#>  6 hard, artisan              hard         
+#>  7 soft, soft-ripened         soft         
+#>  8 soft, brined               soft         
+#>  9 semi-soft, blue-veined     soft         
+#> 10 soft                       soft         
+#> 11 firm, artisan              hard         
+#> 12 hard                       hard         
+#> 13 semi-soft, artisan         soft         
+#> 14 semi-soft, smear-ripened   soft         
+#> 15 soft, semi-soft            soft         
+#> 16 fresh soft                 soft         
+#> 17 soft, semi-soft, organic   soft         
+#> 18 firm                       hard         
+#> 19 fresh soft, artisan        soft         
+#> 20 hard, smear-ripened        hard
+```
+
+Any trend by type?
+
+``` r
+cheeses |> 
+  filter(
+    !is.na(type_category),
+    !is.na(fat_content_numeric)
+  ) |> 
+  ggplot(aes(x = type_category, y = fat_content_numeric)) +
+  geom_boxplot()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
